@@ -1,0 +1,189 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <time.h>
+#include <signal.h>
+#include <pthread.h>
+#include <dirent.h>
+#include <semaphore.h>
+
+
+
+
+#define ITEMS_COUNT 2
+
+
+struct item {
+    uint16_t n;
+    char description[250];
+    float weight;
+    float price;
+};
+
+struct sll{
+    struct item it;
+    struct sll *next;
+};
+
+
+
+
+
+
+void push(struct sll **head, struct item elem){
+    struct sll* element = malloc(sizeof(struct sll));
+    element->it = elem; 
+    element->next = *head;
+    *head = element;
+}
+
+
+
+struct sll* sortedMerge(struct sll* listA, struct sll* listB, int(*cmp)(int, int)){
+    struct sll* sorted = NULL;
+    if (listA == NULL){
+        return listB;
+    }
+    if (listB == NULL){
+        return listA;
+    }
+    if (cmp(listA->it, listB->it) > 0){
+        sorted = listA;
+        sorted->next = sortedMerge(listA->next, listB, cmp);
+    } else {
+        sorted = listB;
+        sorted->next = sortedMerge(listA, listB->next, cmp);
+    }
+    return sorted;
+}
+
+
+void frontBackSplit(struct sll *list, struct sll** front, struct sll** back){
+    struct sll* slow = list;
+    struct sll* fast = list->next;
+    while (fast != NULL){
+        fast = fast->next;
+        if (fast  != NULL){
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    *front = list;
+    *back = slow->next;
+    slow->next = NULL;
+}
+
+void mergeSort(struct sll **list, int(*cmp)(float, float)){
+    if (*list == NULL || (*list)->next == NULL){
+        return;
+    }
+    struct sll *front = NULL, *back = NULL;
+    frontBackSplit(*list, &front, &back);
+    mergeSort(&front, cmp);
+    mergeSort(&back, cmp);
+    *list = sortedMerge(front, back, cmp);
+}
+
+void freeList(struct sll** head){
+    struct sll* current = *head;
+    while (current != NULL){
+        struct sll* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    *head = NULL;
+}
+
+double totalItemsWeight(struct sll *items) {
+
+    struct sll *temp = items;
+    double totalweight = 0;
+    while(item!=NULL) {
+        totalItemsWeight = totalItemsWeight + temp->weight;
+        temp = temp->next;
+    }
+
+
+}
+float cmp(float a, float b) {
+   
+    if(fabs(a - b) < 0.001) {
+        return 0;
+    } else if(a > b) {
+        return -1;
+    } else {
+        return 1;
+    }
+
+}
+
+void prnt(struct sll* head){
+    struct sll* current = head;
+    while (current != NULL){
+        printf("Item with number: %u Description: %s, Weight: %.2lf Price: %.2lf\n", current->n, current->description, current-weight, current->price); 
+        current = current->next;
+    }
+}
+
+
+struct item {
+    uint16_t n;
+    char description[250];
+    float weight;
+    float price;
+};
+
+
+void prnt2(struct sll *head) {
+    printf(" Item with least weight: Item with number: %u Description: %s, Weight: %.2lf Price: %.2lf\n", head->n, head->description, head-weight, head->price);
+};
+
+int main(int argc, char *argv[]) {
+    struct sll*head = NULL;
+
+
+     srand(time(NULL));
+
+
+        
+
+
+        for(int i = 0; i < ITEMS_COUNT; i++) {
+        struct item a;
+        uint16_t randn = (uint16_t)(rand()%(2323-100 + 1) + 100);
+
+        float a = ((100 - 0.100) * ((float)rand() / RAND_MAX)) + 0.100; //
+        float pr =  ((1500 - 1) * ((float)rand() / RAND_MAX)) + 1;
+
+            char arr[250];
+                for(int i = 0; i < 249; i++ ) {
+                    char[i] = (char)(rand()%(122-97 + 1) + 97);
+                }
+                arr[249] = '\0';
+                a.n = randn;
+                strcpy(a.description, arr);     
+                a.weight = a;
+                a.price = pr;
+                push(&head, a);
+                    
+        }
+
+        prnt(head);
+        mergeSort(&head, cmp);
+        prnt2(&head);
+
+
+        freelist(&head);
+
+
+
+ return 0;
+}
+
+ 
